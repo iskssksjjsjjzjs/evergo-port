@@ -58,17 +58,15 @@ jobs:
         run: |
           cd core
           set -o pipefail
-          ./unixnu build kernel -D ../evergo-port 2>&1 | tee /tmp/kernel-build.log | tail -80
+          ./unixnu build kernel -D ../evergo-port 2>&1 | tee /tmp/kernel-build.log | tail -200
 
       - name: Show kernel build tail on failure
         if: failure()
         run: |
-          echo "=== kernel-build.log tail ==="
-          tail -120 /tmp/kernel-build.log 2>/dev/null || true
-          echo "=== kernel-bootstrap.log (known path) ==="
-          cat core/out/evergo/ipados-17.7.11-21H461/evergo/logs/kernel-bootstrap.log 2>/dev/null | tail -150 || true
-          echo "=== any kernel-bootstrap.log ==="
-          find core/out -name 'kernel-bootstrap.log' -exec tail -150 {} \; 2>/dev/null || true
+          echo "=== kernel-build.log last 250 lines ==="
+          tail -250 /tmp/kernel-build.log 2>/dev/null || true
+          echo "=== search errors in full log ==="
+          grep -n -iE 'error|undefined|no such|failed|ld:' /tmp/kernel-build.log 2>/dev/null | tail -40 || true
 
       - name: Build userdata
         run: |
