@@ -3,7 +3,7 @@
 schema_version = 2
 
 [board]
-example = true
+example = false
 name = "evergo"
 soc = "MT6833"
 soc_source = "mt6833"
