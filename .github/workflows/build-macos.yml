@@ -63,12 +63,10 @@ jobs:
       - name: Show kernel build tail on failure
         if: failure()
         run: |
-          echo "=== find all logs ==="
-          find core/out -name '*.log' 2>/dev/null || true
-          echo "=== cat kernel-bootstrap.log ==="
-          find core/out -name 'kernel-bootstrap.log' -exec sh -c 'echo --- {}; tail -200 "{}"' \; 2>/dev/null || true
-          echo "=== cat kernel-build.log full ==="
-          cat /tmp/kernel-build.log 2>/dev/null | tail -150 || true
+          echo "=== grep errors in kernel-bootstrap.log ==="
+          find core/out -name 'kernel-bootstrap.log' -exec sh -c 'grep -n -iE "error|fatal|undefined|no such|ld:|assert" "{}" | tail -40' \; 2>/dev/null || true
+          echo "=== tail kernel-bootstrap.log ==="
+          find core/out -name 'kernel-bootstrap.log' -exec sh -c 'tail -60 "{}"' \; 2>/dev/null || true
 
       - name: Build userdata
         run: |
