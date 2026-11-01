@@ -33,27 +33,27 @@ jobs:
       - name: Fetch sources
         run: |
           cd core
-          ./unixnu fetch -D evergo-port
+          ./unixnu fetch -D ../evergo-port
 
       - name: Select defconfig
         run: |
           cd core
-          ./unixnu defconfig evergo_defconfig -D evergo-port
+          ./unixnu defconfig evergo_defconfig -D ../evergo-port
 
       - name: Build kernel (XNU)
         run: |
           cd core
-          ./unixnu build kernel -D evergo-port
+          ./unixnu build kernel -D ../evergo-port
 
       - name: Build userdata
         run: |
           cd core
-          ./unixnu build userdata -D evergo-port
+          ./unixnu build userdata -D ../evergo-port
 
       - name: Build payload
         run: |
           cd core
-          ./unixnu build payload -D evergo-port \
+          ./unixnu build payload -D ../evergo-port \
             --unique-chip-id "${{ github.event.inputs.unique_chip_id }}"
 
       - name: Upload artifacts
