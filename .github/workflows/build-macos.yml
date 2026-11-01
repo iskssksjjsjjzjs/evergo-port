@@ -24,6 +24,19 @@ jobs:
         run: |
           git clone --recurse-submodules https://github.com/UniXNU/UniXNU.git core
 
+      - name: Fix upstream zzz-boot-progress.patch
+        run: |
+          python3 - <<'PY'
+          import re
+          p = "core/patches/xnu/zzz-boot-progress.patch"
+          s = open(p, encoding="utf-8").read()
+          # 删除引用 XNU_SHENG_PMGR 的失效 hunk（新版 XNU 已删除该代码块）
+          s2 = re.sub(r'@@ -773,7 \+775,9 @@.*?(?=@@ |\Z)', '', s, flags=re.S)
+          assert s2 != s, "hunk not found"
+          open(p, "w", encoding="utf-8").write(s2)
+          print("removed stale XNU_SHENG_PMGR hunk")
+          PY
+
       - name: Verify Xcode
         run: |
           xcode-select -p
