@@ -24,11 +24,6 @@ jobs:
         run: |
           git clone --recurse-submodules https://github.com/UniXNU/UniXNU.git core
 
-      - name: Install latest LLVM for archive builders
-        run: |
-          brew install llvm lld 2>&1 | tail -5 || true
-          ls /opt/homebrew/opt/llvm/bin/ | head -5
-
       - name: Fix upstream zzz-boot-progress.patch
         run: |
           python3 - <<'PY'
@@ -60,6 +55,7 @@ jobs:
       - name: Build kernel (XNU)
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          XNU_EXTRA_CFLAGS: "-Wno-reserved-identifier -Wno-pre-c11-compat -Wno-missing-designated-field-initializers -Wno-suggest-override -Wno-suggest-destructor-override -Wno-ms-bitfield-padding"
         run: |
           cd core
           set -o pipefail
