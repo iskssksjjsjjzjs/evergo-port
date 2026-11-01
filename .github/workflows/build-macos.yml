@@ -55,12 +55,16 @@ jobs:
       - name: Build kernel (XNU)
         run: |
           cd core
-          ./unixnu build kernel -D ../evergo-port 2>&1 | tail -150
+          set -o pipefail
+          ./unixnu build kernel -D ../evergo-port 2>&1 | tee /tmp/kernel-build.log | tail -80
 
-      - name: Show kernel log on failure
+      - name: Show kernel build tail on failure
         if: failure()
         run: |
-          find core/out -name 'kernel-bootstrap.log' -exec sh -c 'echo "=== {} ==="; tail -80 "{}"' \;
+          echo "=== kernel-build.log tail ==="
+          tail -120 /tmp/kernel-build.log 2>/dev/null || true
+          echo "=== kernel-bootstrap.log ==="
+          find core/out -name 'kernel-bootstrap.log' -exec tail -120 {} \; 2>/dev/null || true
 
       - name: Build userdata
         run: |
@@ -74,10 +78,12 @@ jobs:
             --unique-chip-id "${{ github.event.inputs.unique_chip_id }}"
 
       - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: evergo-build-output
           path: |
             core/out/evergo/**/*.img
             core/out/evergo/**/*.json
+            /tmp/kernel-build.log
           retention-days: 7
