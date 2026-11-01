@@ -1,0 +1,68 @@
+name: Build XNU Kernel & Payload (macOS)
+
+on:
+  workflow_dispatch:
+    inputs:
+      unique_chip_id:
+        description: '设备的 unique_chip_id（16 位十六进制）'
+        required: true
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-14
+    timeout-minutes: 180
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: evergo-port
+
+      - name: Clone UniXNU core (with submodules)
+        run: |
+          git clone --recurse-submodules https://github.com/UniXNU/UniXNU.git core
+
+      - name: Verify Xcode
+        run: |
+          xcode-select -p
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-path
+
+      - name: Fetch sources
+        run: |
+          cd core
+          ./unixnu fetch -D ../evergo-port
+
+      - name: Select defconfig
+        run: |
+          cd core
+          ./unixnu defconfig evergo_defconfig -D ../evergo-port
+
+      - name: Build kernel (XNU)
+        run: |
+          cd core
+          ./unixnu build kernel -D ../evergo-port
+
+      - name: Build userdata
+        run: |
+          cd core
+          ./unixnu build userdata -D ../evergo-port
+
+      - name: Build payload
+        run: |
+          cd core
+          ./unixnu build payload -D ../evergo-port \
+            --unique-chip-id "${{ github.event.inputs.unique_chip_id }}"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: evergo-build-output
+          path: |
+            core/out/evergo/**/*.img
+            core/out/evergo/**/*.json
+          retention-days: 7
