@@ -24,36 +24,16 @@ jobs:
         run: |
           git clone --recurse-submodules https://github.com/UniXNU/UniXNU.git core
 
-      - name: Fix upstream patches and API rate limit
+      - name: Fix upstream zzz-boot-progress.patch
         run: |
           python3 - <<'PY'
           import re
-
-          # 1. 删除 zzz-boot-progress.patch 里失效的 XNU_SHENG_PMGR hunk
           p = "core/patches/xnu/zzz-boot-progress.patch"
           s = open(p, encoding="utf-8").read()
           s2 = re.sub(r'@@ -773,7 \+775,9 @@.*?(?=@@ |\Z)', '', s, flags=re.S)
           assert s2 != s, "hunk not found"
           open(p, "w", encoding="utf-8").write(s2)
           print("removed stale XNU_SHENG_PMGR hunk")
-
-          # 2. 给 prepare-xnu-source.py 注入 GITHUB_TOKEN，绕过匿名 API 限流
-          p2 = "core/scripts/prepare-xnu-source.py"
-          s = open(p2, encoding="utf-8").read()
-          s = s.replace(
-              "import urllib.request\n",
-              "import urllib.request\n\n"
-              "_TOKEN = os.environ.get('GITHUB_TOKEN', '')\n"
-              "def _urlopen(url, timeout=30):\n"
-              "    req = urllib.request.Request(url, headers={'Authorization': 'Bearer ' + _TOKEN} if _TOKEN else {})\n"
-              "    return urllib.request.urlopen(req, timeout=timeout)\n")
-          for old in ["urllib.request.urlopen(URL, timeout=30)",
-                      "urllib.request.urlopen(crypto_url, timeout=30)",
-                      "urllib.request.urlopen(url, timeout=30)"]:
-              assert old in s, f"pattern not found: {old}"
-              s = s.replace(old, "_urlopen(" + old.split('(')[1].split(',')[0] + ", timeout=30)")
-          open(p2, "w", encoding="utf-8").write(s)
-          print("injected GITHUB_TOKEN into prepare-xnu-source.py")
           PY
 
       - name: Verify Xcode
