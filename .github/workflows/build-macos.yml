@@ -65,8 +65,10 @@ jobs:
         run: |
           echo "=== kernel-build.log tail ==="
           tail -120 /tmp/kernel-build.log 2>/dev/null || true
-          echo "=== kernel-bootstrap.log ==="
-          find core/out -name 'kernel-bootstrap.log' -exec tail -120 {} \; 2>/dev/null || true
+          echo "=== kernel-bootstrap.log (known path) ==="
+          cat core/out/evergo/ipados-17.7.11-21H461/evergo/logs/kernel-bootstrap.log 2>/dev/null | tail -150 || true
+          echo "=== any kernel-bootstrap.log ==="
+          find core/out -name 'kernel-bootstrap.log' -exec tail -150 {} \; 2>/dev/null || true
 
       - name: Build userdata
         run: |
