@@ -1,0 +1,7 @@
+# MT6833 shared layer. Currently reuses MT6835-common (same SoC family).
+# Replace git/commit once a dedicated MT6833 common layer is published.
+[[source]]
+name = "mt6833"
+kind = "soc"
+git = "https://github.com/LittleStar-OuO/UniXNU-mt6835-common"
+commit = "694324c10be80118a82cbed29bd98ed4e830640e"
