@@ -30,7 +30,6 @@ jobs:
           import re
           p = "core/patches/xnu/zzz-boot-progress.patch"
           s = open(p, encoding="utf-8").read()
-          # 删除引用 XNU_SHENG_PMGR 的失效 hunk（新版 XNU 已删除该代码块）
           s2 = re.sub(r'@@ -773,7 \+775,9 @@.*?(?=@@ |\Z)', '', s, flags=re.S)
           assert s2 != s, "hunk not found"
           open(p, "w", encoding="utf-8").write(s2)
@@ -56,7 +55,12 @@ jobs:
       - name: Build kernel (XNU)
         run: |
           cd core
-          ./unixnu build kernel -D ../evergo-port
+          ./unixnu build kernel -D ../evergo-port 2>&1 | tail -150
+
+      - name: Show kernel log on failure
+        if: failure()
+        run: |
+          find core/out -name 'kernel-bootstrap.log' -exec sh -c 'echo "=== {} ==="; tail -80 "{}"' \;
 
       - name: Build userdata
         run: |
