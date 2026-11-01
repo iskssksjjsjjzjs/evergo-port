@@ -34,6 +34,14 @@ jobs:
           assert s2 != s, "hunk not found"
           open(p, "w", encoding="utf-8").write(s2)
           print("removed stale XNU_SHENG_PMGR hunk")
+
+          # build-arm-driver.py 硬编码的 -Wno-unnecessary-virtual-specifier 在新 clang 已移除
+          p3 = "core/scripts/build-arm-driver.py"
+          s3 = open(p3, encoding="utf-8").read()
+          assert "'-Wno-unnecessary-virtual-specifier', " in s3, "flag not found"
+          s3 = s3.replace("'-Wno-unnecessary-virtual-specifier', ", "")
+          open(p3, "w", encoding="utf-8").write(s3)
+          print("removed -Wno-unnecessary-virtual-specifier from build-arm-driver.py")
           PY
 
       - name: Verify Xcode
