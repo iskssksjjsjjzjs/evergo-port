@@ -1,0 +1,32 @@
+/*
+ * Redmi Note 11 5G / 11T 5G (evergo, MT6833)
+ * 板级 DTS 骨架 —— SoC 共享层 mt6833.dtsi 来自 mt6835-common 改编
+ *
+ * 占位项（需真机 root 提取）：
+ *   - 内存节点 memory@ / DRAM bank 布局（/proc/iomem）
+ *   - 面板 framebuffer 参数
+ *   - UFS / PMIC 电源键
+ */
+
+/dts-v1/;
+#include "mt6833.dtsi"
+
+/ {
+	model = "Xiaomi Redmi Note 11 5G";
+	compatible = "xiaomi,evergo", "mediatek,mt6833";
+
+	chosen {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		/* bootargs 由 payload.adt 注入 */
+	};
+
+	/* 占位：需从真机提取 DRAM 布局 */
+	memory@40000000 {
+		device_type = "memory";
+		/* reg = <0 0x40000000 0 0x200000000>;  示例 8GiB，待实测 */
+	};
+
+	/* 面板：NT35595 DSI cmd 模式，1080x2400 */
+	/* framebuffer 参数待实测后填入 payload.adt */
+};
