@@ -23,6 +23,10 @@ jobs:
       - name: Clone UniXNU core (with submodules)
         run: |
           git clone --recurse-submodules https://github.com/UniXNU/UniXNU.git core
+          cd core
+          # pin 到 12377 迁移之前、DriverKit 头文件修复之后的稳定版本
+          git checkout 018c8f3439f1
+          git submodule update --init --recursive
 
       - name: Fix upstream zzz-boot-progress.patch
         run: |
