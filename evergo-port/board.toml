@@ -24,9 +24,9 @@ source = "device:dts/evergo.dts"
 include_dirs = ["soc:dts"]
 
 [userdata]
-# 占位：需从真机 GPT 提取（root 后 cat /proc/partitions 或 fastboot oem get_gpt）
-first_lba = 0
-last_lba = 0
+# 真机实测（ON9LGAINJN4H558P，UFS 4096B 扇区，GPT 解析）
+first_lba = 0x304000
+last_lba = 0x3b94ff7
 lba_bytes = 4096
 windows = [
   { name = "OS", component = "OS" },
